@@ -1,0 +1,32 @@
+{
+  "phrases": [
+    "send otp",
+    "one time password",
+    "verify otp",
+    "transfer immediately",
+    "act now",
+    "limited time",
+    "click here",
+    "wire transfer",
+    "bank account number",
+    "investment opportunity",
+    "double your money",
+    "verify your account",
+    "account suspended",
+    "urgent",
+    "verify identity",
+    "tax refund",
+    "provide your account",
+    "card number",
+    "pin",
+    "claim by clicking",
+    "call this number",
+    "parcel is delayed"
+  ],
+  "regex": [
+    "\\b\\d{4,6}\\s*is\\s*your\\s*otp\\b",
+    "\\b(send|share)\\s+otp\\b",
+    "\\b(urgent|immediately|asap)\\b",
+    "\\b(account|bank|upi|card)\\b.*\\d{3,}"
+  ]
+}
