@@ -1,7 +1,11 @@
 from pathlib import Path
+from pydub import AudioSegment
 import joblib
 import json
 import re
+
+# 🔧 Tell pydub where ffmpeg is installed
+AudioSegment.converter = r"C:\ffmpeg\bin\ffmpeg.exe"
 
 HERE = Path(__file__).resolve().parent.parent
 MODEL_FILE = HERE / "models" / "pipeline.pkl"
