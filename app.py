@@ -1,9 +1,10 @@
 import streamlit as st
 from src.detector import FraudDetector
-from audiorecorder import audiorecorder
 import speech_recognition as sr
 import tempfile
 import os
+import sounddevice as sd
+import soundfile as sf   # for saving audio
 
 # Initialize detector
 detector = FraudDetector()
@@ -38,15 +39,21 @@ if uploaded_file is not None:
 
 # ---- Live Audio ----
 st.subheader("🎤 Live Audio Fraud Detection")
-audio = audiorecorder("Start Recording", "Stop Recording")
 
-if len(audio) > 0:
-    st.audio(audio.export().read(), format="audio/wav")
+duration = st.slider("Recording duration (seconds)", 3, 15, 5)
 
-    # Save temp file
+if st.button("Start Recording"):
+    st.info("Recording... Speak now!")
+    recording = sd.rec(int(duration * 44100), samplerate=44100, channels=1, dtype="float32")
+    sd.wait()
+    st.success("✅ Recording complete!")
+
+    # Save to temp WAV
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmpfile:
-        audio.export(tmpfile.name, format="wav")
+        sf.write(tmpfile.name, recording, 44100)
         tmp_path = tmpfile.name
+
+    st.audio(tmp_path, format="audio/wav")
 
     # Speech Recognition
     recognizer = sr.Recognizer()
