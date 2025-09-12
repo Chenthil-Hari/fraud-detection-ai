@@ -1,40 +1,34 @@
-# Scam/Fraud Keyword Detector (Prototype)
+Project README – AI for Real-Time Fraud & Social Engineering Detection
+Objective
+The objective of this project is to develop an AI-powered system that can analyze live text and audio conversations in real time to detect suspicious phrases, urgency cues, or fraudulent patterns. The system will provide alerts and warnings to financial institutions, customer support teams, and end-users to prevent financial fraud caused by social engineering attacks and scams.
+Tech Stack
+• Programming Languages: Python
+Streamlit – web app interface
+•  Pandas – data handling for training
+•  Scikit-learn – ML pipeline (training & predictions)
+•  Joblib – saving & loading ML models
+•  Regex (re) – rule-based keyword detection
+•  pydub + ffmpeg (optional) – audio-to-text preprocessing if needed
 
-This is a prototype that detects suspicious social engineering phrases using:
-- Rule-based keywords & regex
-- TF-IDF + LogisticRegression fallback
-- Streamlit demo UI
+Setup Steps
+1. Clone the Repository
+git clone https://github.com/Chenthil-Hari/web.git
+cd web
+2. Install Dependencies
+pip install -r requirements.txt
+3. Prepare Data & Train Model
+- Add training samples in sample_data.csv
+- Run training to process the dataset and generate the model/keywords:
+  python src/train.py
+4. Run the Streamlit Application
+streamlit run src/app_streamlit.py
+Open http://localhost:8501 in your browser to access the app.
+📊 Example
+Input:  "This is a scam, click here!"
+Output: ⚠️ Scam keyword detected → 'scam'
 
-## Project layout
-sample_data.csv
-models/
-  - keywords.json
-src/
-  - train.py
-  - detector.py
-  - app_streamlit.py
-requirements.txt
-README.md
-
-## Quick start (Git Bash)
-1. Create & activate virtualenv
-   python -m venv venv
-   # Git Bash / Linux / macOS
-   source venv/bin/activate
-   # If using Windows PowerShell:
-   # venv\\Scripts\\Activate.ps1
-
-2. Install dependencies
-   pip install -r requirements.txt
-
-3. Train model
-   python -m src.train
-
-4. Run Streamlit demo
-   streamlit run src/app_streamlit.py
-   # If import errors occur, run:
-   # PYTHONPATH=. streamlit run src/app_streamlit.py
-
-## Notes
-- Audio transcription uses Google Web Speech API (internet required). Install ffmpeg for audio conversion if needed.
-- This is a demo/prototype only — not production-ready.
+Team Members
+• Team Leader: Ahilesh M
+• Members:
+   - B S Chenthil Hari
+   - Jyothika V
