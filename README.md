@@ -28,3 +28,12 @@ The tool provides an easy-to-use **Streamlit web application** where users can i
    ```bash
    git clone https://github.com/Chenthil-Hari/web.git
    cd web
+2.Install Dependencies pip install -r requirements.txt
+3. Prepare Data & Train Model - Add training samples in sample_data.csv - Run training to process the dataset and generate the model/keywords: python src/train.py 4. Run the Streamlit Application streamlit run src/app_streamlit.py Open http://localhost:8501 in your browser to access the app. 
+📊 Example Input: "This is a scam, click here!" 
+Output: ⚠️ Scam keyword detected → 'scam' 
+
+
+## Team Members:
+• Team Leader: Ahilesh M 
+• Members: - B S Chenthil Hari - Jyothika V
