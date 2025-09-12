@@ -1,103 +1,68 @@
 import streamlit as st
-from pathlib import Path
+from src.detector import FraudDetector
+from audiorecorder import audiorecorder
+import speech_recognition as sr
 import tempfile
 import os
-import sys
 
-# allow src imports to work when running from repo root
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if ROOT not in sys.path:
-    sys.path.insert(0, ROOT + "/src")
+# Initialize detector
+detector = FraudDetector()
 
-from detector import FraudDetector
+st.set_page_config(page_title="Fraud Detection AI", page_icon="🔍", layout="wide")
+st.title("🔍 Fraud Detection AI")
 
-# optional audio libs
-HAS_AUDIO = True
-try:
-    import speech_recognition as sr
-    from pydub import AudioSegment
-except Exception:
-    HAS_AUDIO = False
+st.markdown("This app detects **fraudulent messages** using ML + keyword matching.")
 
-st.set_page_config(page_title="Fraud Detector Demo", layout="centered")
-st.title("🚨 Fraud & Social Engineering Detector — Demo")
+# ---- Text Input ----
+user_input = st.text_area("Enter a message or text to analyze:", "")
 
-st.markdown(
-    """
-This demo analyzes text messages or short audio uploads for suspicious phrases and urgency patterns.
-"""
-)
-
-try:
-    detector = FraudDetector()
-except Exception as e:
-    st.error("Model not found. Please train the model first: `python -m src.train`\\nError: " + str(e))
-    st.stop()
-
-st.header("Analyze typed text")
-text = st.text_area("Enter chat/call transcript (or type to simulate):", height=150)
-col1, col2 = st.columns(2)
-with col1:
-    if st.button("Analyze Text"):
-        if not text.strip():
-            st.info("Enter some text to analyze.")
+if st.button("Analyze Text"):
+    if user_input.strip():
+        result = detector.analyze(user_input)
+        st.subheader("📊 Analysis Result")
+        if result["flag"]:
+            st.error(f"⚠️ Fraud Detected! (Source: {result['source']})")
         else:
-            res = detector.analyze(text)
-            if res["flag"]:
-                if res["source"] == "keyword":
-                    st.warning("⚠️ Suspicious — keyword/regex match found!")
-                    st.write("Matches:", res["matches"])
-                else:
-                    st.warning(f"⚠️ Suspicious — ML model flagged this message (score {res['ml_score']:.2f})")
-            else:
-                st.success("✔️ Looks safe (no keywords and ML score below threshold).")
-            st.write("Full result:", res)
-
-with col2:
-    st.info("Try examples:\\n- 'Your account is suspended. Send OTP to reactivate.'\\n- 'Can you share the presentation deck?'\\n- 'Limited time investment opportunity, guaranteed returns.'")
-
-st.write("---")
-st.header("Audio upload (optional)")
-st.write("Upload a short WAV/MP3 file. The app will transcribe then analyze the text (needs internet for Google STT).")
-
-audio_file = st.file_uploader("Upload audio (wav, mp3, m4a, flac)", type=["wav", "mp3", "m4a", "flac"])
-if audio_file is not None:
-    if not HAS_AUDIO:
-        st.error("Audio features require `SpeechRecognition` and `pydub` installed. See README.")
+            st.success("✅ No fraud detected.")
+        st.json(result)
     else:
-        tfile = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(audio_file.name)[1])
-        tfile.write(audio_file.read())
-        tfile.flush()
-        wav_path = tfile.name
-        if not wav_path.lower().endswith(".wav"):
-            try:
-                sound = AudioSegment.from_file(wav_path)
-                new_wav = wav_path + ".wav"
-                sound.export(new_wav, format="wav")
-                wav_path = new_wav
-            except Exception as ex:
-                st.error("Audio conversion failed: " + str(ex))
-                wav_path = None
-        if wav_path:
-            r = sr.Recognizer()
-            try:
-                with sr.AudioFile(wav_path) as source:
-                    audio = r.record(source)
-                transcript = r.recognize_google(audio)
-                st.subheader("Transcription")
-                st.write(transcript)
-                res = detector.analyze(transcript)
-                if res["flag"]:
-                    if res["source"] == "keyword":
-                        st.warning("⚠️ Suspicious — keyword/regex match found in transcription.")
-                        st.write("Matches:", res["matches"])
-                    else:
-                        st.warning(f"⚠️ Suspicious — ML flagged transcription (score {res['ml_score']:.2f})")
-                else:
-                    st.success("✔️ Transcription looks safe.")
-                st.write("Full result:", res)
-            except Exception as e:
-                st.error("Transcription failed. (This demo uses Google STT which needs internet). Error: " + str(e))
+        st.warning("⚠️ Please enter some text.")
 
-st.write("---")
-st.markdown("### Notes\\n- Keyword checks are strict: if a phrase matches, the message is flagged immediately.\\n- The ML model provides a fallback when no keywords match.")
+# ---- File Upload ----
+uploaded_file = st.file_uploader("Or upload a text file", type=["txt"])
+if uploaded_file is not None:
+    text = uploaded_file.read().decode("utf-8")
+    result = detector.analyze(text)
+    st.subheader("📊 Analysis Result")
+    st.json(result)
+
+# ---- Live Audio ----
+st.subheader("🎤 Live Audio Fraud Detection")
+audio = audiorecorder("Start Recording", "Stop Recording")
+
+if len(audio) > 0:
+    st.audio(audio.export().read(), format="audio/wav")
+
+    # Save temp file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmpfile:
+        audio.export(tmpfile.name, format="wav")
+        tmp_path = tmpfile.name
+
+    # Speech Recognition
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(tmp_path) as source:
+        audio_data = recognizer.record(source)
+        try:
+            text = recognizer.recognize_google(audio_data)
+            st.write("📝 Transcribed Text:", text)
+            result = detector.analyze(text)
+            st.subheader("📊 Analysis Result")
+            if result["flag"]:
+                st.error(f"⚠️ Fraud Detected! (Source: {result['source']})")
+            else:
+                st.success("✅ No fraud detected.")
+            st.json(result)
+        except sr.UnknownValueError:
+            st.warning("⚠️ Could not understand the audio.")
+        except sr.RequestError:
+            st.error("API error. Try again later.")
