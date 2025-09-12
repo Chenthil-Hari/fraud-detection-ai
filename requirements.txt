@@ -6,3 +6,5 @@ nltk
 SpeechRecognition
 pydub
 numpy
+streamlit-audiorecorder
+streamlit-audiorecorder
