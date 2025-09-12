@@ -7,3 +7,4 @@ SpeechRecognition
 pydub
 numpy
 pyaudio
+streamlit-audiorecorder
