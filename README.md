@@ -1,36 +1,30 @@
-Project README – AI for Real-Time Fraud & Social Engineering Detection
-Objective
-The objective of this project is to develop an AI-powered system that can analyze live text and audio conversations in real time to detect suspicious phrases, urgency cues, or fraudulent patterns. The system will provide alerts and warnings to financial institutions, customer support teams, and end-users to prevent financial fraud caused by social engineering attacks and scams.
+# 🚀 Scam/Fraud Keyword Detector
 
+## 🎯 Objective
+This project is a simple prototype designed to detect scam or fraud-related content in text messages, emails, or chats.  
+The detection is performed in two ways:
 
-##Tech Stack
-• Programming Languages: Python
-Streamlit – web app interface
-•  Pandas – data handling for training
-•  Scikit-learn – ML pipeline (training & predictions)
-•  Joblib – saving & loading ML models
-•  Regex (re) – rule-based keyword detection
-•  pydub + ffmpeg (optional) – audio-to-text preprocessing if needed
+- **Keyword/Regex-based detection**: Matches known scam-related phrases or patterns.
+- **Machine Learning (ML) model**: Learns patterns from sample training data and predicts whether a given text is likely to be fraudulent.
 
-##Setup Steps
-1. Clone the Repository
-git clone https://github.com/Chenthil-Hari/web.git
-cd web
-2. Install Dependencies
-pip install -r requirements.txt
-3. Prepare Data & Train Model
-- Add training samples in sample_data.csv
-- Run training to process the dataset and generate the model/keywords:
-  python src/train.py
-4. Run the Streamlit Application
-streamlit run src/app_streamlit.py
-Open http://localhost:8501 in your browser to access the app.
-📊 Example
-Input:  "This is a scam, click here!"
-Output: ⚠️ Scam keyword detected → 'scam'
+The tool provides an easy-to-use **Streamlit web application** where users can input text and instantly see detection results.
 
-##Team Members
-• Team Leader: Ahilesh M
-• Members:
-   - B S Chenthil Hari
-   - Jyothika V
+---
+
+## 🛠️ Tech Stack
+- **Python 3.x** – Core programming language  
+- **Streamlit** – For building the interactive web application  
+- **Pandas** – Data preprocessing and handling training data  
+- **Scikit-learn** – Machine Learning pipeline (vectorization + classification)  
+- **Joblib** – Saving and loading trained ML models  
+- **Regex (re)** – Rule-based keyword/regex matching  
+- **Pydub + FFmpeg (optional)** – For handling audio input and converting to text  
+
+---
+
+## ⚙️ Setup Steps
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Chenthil-Hari/web.git
+   cd web
